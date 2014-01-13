@@ -94,10 +94,14 @@ def access_token(request):
             redirect_to = request.session['jira_auth_redirect']
             del request.session['jira_auth_redirect']
             return redirect(redirect_to)
+        elif hasattr(settings, 'JIRA_AUTH_REDIRECT'):
+            return redirect(settings.JIRA_AUTH_REDIRECT)
         else:
-            return redirect('jira-oauth-not-authenticated')
+            raise ImproperlyConfigured("You must specify JIRA_AUTH_REDIRECT " \
+                                       "in your Django settings file or pass " \
+                                       "'auth_redirect' as a GET parameter " \
+                                       "to the 'authorize' view.")
         
-
     # Store access token in session
     if getattr(settings, 'JIRA_SAVE_TOKEN_TO_SESSION', True):
         request.session['jira_access_token'] = token['oauth_token']
@@ -114,8 +118,8 @@ def access_token(request):
         redirect_to = request.session['jira_auth_redirect']
         del request.session['jira_auth_redirect']
         return redirect(redirect_to)
-    elif hasattr(settings, 'JIRA_AUTHORIZE_REDIRECT'):
-        return redirect(settings.JIRA_AUTHORIZE_REDIRECT)
+    elif hasattr(settings, 'JIRA_AUTH_REDIRECT'):
+        return redirect(settings.JIRA_AUTH_REDIRECT)
     else:
         raise ImproperlyConfigured("You must specify JIRA_AUTH_REDIRECT " \
                                    "in your Django settings file or pass " \
